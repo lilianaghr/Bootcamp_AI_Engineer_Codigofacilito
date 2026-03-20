@@ -35,6 +35,14 @@ class Receta(BaseModel):
     dificultad: str = Field(description="Nivel de dificultad: fácil, media o difícil.")
     ingredientes: list[Ingrediente] = Field(description="Lista de ingredientes.")
     pasos: list[str] = Field(description="Pasos de preparación en orden.")
+    porciones: int = Field(description="Porciones del platillo.")
+
+class Factura(BaseModel):
+    emisor: str = Field(description="Emisor de la factura")
+    receptor: str = Field(description="Receptor de la factura")
+    concepto: str = Field(description="Concepto de la factura")
+    total: str = Field(description="Total de la factura")
+    fecha: str= Field(description="Fecha de la factura")
 
 
 print("=" * 60)
@@ -94,14 +102,20 @@ def imprimir_receta(receta: Receta) -> None:
     for i, paso in enumerate(receta.pasos, 1):
         print(f"    {i}. {paso}")
     print()
+    print("Porciones", receta.porciones)
 
 
 print("\n" + "=" * 60)
 print("  PARTE 2: Extracción del texto base")
 print("=" * 60)
 
-receta_chilaquiles = extraer_receta(texto_chilaquiles)
+script_directory = os.path.dirname(os.path.abspath(__file__))
+print(script_directory)
+recetatxt = open(script_directory+'/'+"receta_brownie.txt","r")
+receta_chilaquiles = extraer_receta(recetatxt.read()) #(texto_chilaquiles)
 imprimir_receta(receta_chilaquiles)
+
+recetatxt.close()
 
 
 # =============================================
@@ -204,6 +218,23 @@ tools = [
             },
         },
     },
+        {
+        "type": "function",
+        "function": {
+            "name": "crear_factura",
+            "description": "Crea la factura de la receta.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "texto": {
+                        "type": "string",
+                        "description": "Texto libre que contiene la información para facturar",
+                    },
+                },
+                "required": ["texto"],
+            },
+        },
+    }
 ]
 
 
@@ -302,3 +333,5 @@ respuesta = procesar_mensaje("¿Tienes alguna receta de tacos?")
 print(f"\n{respuesta}")
 
 print(f"\nTotal de recetas guardadas: {len(recetas_guardadas)}")
+
+
